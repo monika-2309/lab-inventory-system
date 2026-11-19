@@ -45,8 +45,9 @@ A real-time lab inventory management system built with **Spring Boot 3**, **MySQ
 Navigate to the `backend/` folder and start the application:
 
 ```bash
-# On Windows PowerShell
 cd backend
+
+# On Windows PowerShell (using wrapper)
 .\mvnw spring-boot:run
 
 # Or with Maven installed
@@ -54,6 +55,13 @@ mvn spring-boot:run
 ```
 
 Once running, open **[http://localhost:8080](http://localhost:8080)** in your browser.
+
+*(Optional) If you prefer running the separate frontend dev server on port 3000:*
+```bash
+cd frontend
+npm run dev
+```
+Then open **[http://localhost:3000](http://localhost:3000)**.
 
 ---
 
