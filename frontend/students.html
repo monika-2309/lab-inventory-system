@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Students - ECE Inventory System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="main-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+                    <h1 style="font-weight: 600; letter-spacing: -0.5px;">Students</h1>
+                </div>
+                <button class="btn btn-success" onclick="document.getElementById('addModal').style.display='flex'"><i class="fas fa-user-plus" style="margin-right: 8px;"></i> Register Student</button>
+            </div>
+            
+            <div class="glass-card" style="padding: 0; overflow: hidden;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>USN</th>
+                            <th>Name</th>
+                            <th>Branch</th>
+                            <th>QR Text</th>
+                        </tr>
+                    </thead>
+                    <tbody id="student-list"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div id="addModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center;">
+        <div class="glass-card auth-card" style="width: 100%; max-width: 500px;">
+            <h2 style="margin-bottom: 1.5rem;">Register Student</h2>
+            <form id="addStudentForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="stuName" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>USN</label>
+                    <input type="text" id="stuUsn" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Branch</label>
+                    <input type="text" id="stuBranch" class="form-control" required value="ECE">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 2rem;">
+                    <button type="button" class="btn" style="background: transparent; border: 1px solid var(--border);" onclick="document.getElementById('addModal').style.display='none'">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        createSidebar('nav-students');
+        
+        async function loadStudents() {
+            try {
+                const students = await apiCall('/students');
+                const tbody = document.getElementById('student-list');
+                tbody.innerHTML = '';
+                students.forEach(s => {
+                    const qrPayload = `${BASE_URL}/api/scan?type=student&qr=${s.qrCodeText}`;
+                    const qrUrl = `${API_BASE}/qrcode?text=${encodeURIComponent(qrPayload)}`;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><b>${s.usn}</b></td>
+                            <td>${s.name}</td>
+                            <td>${s.branch}</td>
+                            <td>
+                                <code>${s.qrCodeText}</code>
+                                <a href="${qrUrl}" target="_blank" style="margin-left:10px; font-size: 0.8rem; color: var(--primary); text-decoration: none;">📥 QR Image</a>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (e) {}
+        }
+        
+        document.getElementById('addStudentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('stuName').value;
+            const usn = document.getElementById('stuUsn').value.toUpperCase();
+            const branch = document.getElementById('stuBranch').value;
+            try {
+                await apiCall('/students', 'POST', { name, usn, branch });
+                document.getElementById('addModal').style.display = 'none';
+                e.target.reset();
+                loadStudents();
+            } catch (err) {}
+        });
+
+        loadStudents();
+    </script>
+</body>
+</html>

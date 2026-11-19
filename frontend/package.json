@@ -1,0 +1,9 @@
+{
+  "name": "lab-inventory-frontend",
+  "version": "1.0.0",
+  "description": "ECE Lab Smart Inventory Frontend",
+  "scripts": {
+    "dev": "npx --yes serve -l 3000 .",
+    "start": "npx --yes serve -l 3000 ."
+  }
+}
